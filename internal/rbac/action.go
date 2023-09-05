@@ -27,6 +27,9 @@ const (
 
 	CreateRunTokenAction
 
+	CreateTeamTokenAction
+	DeleteTeamTokenAction
+
 	CreateModuleAction
 	CreateModuleVersionAction
 	UpdateModuleAction

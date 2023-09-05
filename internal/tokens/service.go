@@ -26,6 +26,7 @@ type (
 		RunTokenService
 		sessionService
 		userTokenService
+		teamTokenService
 		organizationTokenService
 	}
 
@@ -34,6 +35,7 @@ type (
 
 		site         internal.Authorizer // authorizes site access
 		organization internal.Authorizer // authorizes org access
+		team         internal.Authorizer // authorizes team access
 
 		db  *pgdb
 		web *webHandlers

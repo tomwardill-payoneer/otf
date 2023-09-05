@@ -259,6 +259,15 @@ var specs = []controllerSpec{
 						name: "remove-member",
 					},
 				},
+				nested: []controllerSpec{
+					{
+						Name:           "team_token",
+						controllerType: resourcePath,
+						//skipDefaultActions: true,
+						//path:               "/token",
+
+					},
+				},
 			},
 			{
 				Name:           "vcs_provider",

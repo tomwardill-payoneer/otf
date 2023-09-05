@@ -41,6 +41,9 @@ func (h *webHandlers) addHandlers(r *mux.Router) {
 	r.HandleFunc("/profile/tokens/new", h.newUserToken).Methods("GET")
 	r.HandleFunc("/profile/tokens/create", h.createUserToken).Methods("POST")
 
+	// team tokens
+	r.HandleFunc("/teams/{team_id}/team-tokens", h.teamTokens).Methods("GET")
+
 	// organization tokens
 	r.HandleFunc("/organizations/{organization_name}/tokens/show", h.organizationToken).Methods("GET")
 	r.HandleFunc("/organizations/{organization_name}/tokens/delete", h.deleteOrganizationToken).Methods("POST")
@@ -122,6 +125,39 @@ func (h *webHandlers) deleteUserToken(w http.ResponseWriter, r *http.Request) {
 	}
 	html.FlashSuccess(w, "Deleted token")
 	http.Redirect(w, r, paths.Tokens(), http.StatusFound)
+}
+
+// Team tokens
+func (h *webHandlers) teamTokens(w http.ResponseWriter, r *http.Request) {
+	team, err := decode.Param("team_id", r)
+	if err != nil {
+		h.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	tokens, err := h.svc.ListTeamTokens(r.Context(), team)
+	if err != nil {
+		h.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// re-order tokens by creation date, newest first
+	sort.Slice(tokens, func(i, j int) bool {
+		return tokens[i].CreatedAt.After(tokens[j].CreatedAt)
+	})
+
+	h.Render("team_token_list.tmpl", w, struct {
+		html.SitePage
+		// list template expects pagination object but we don't paginate token
+		// listing
+		*resource.Pagination
+		Items []*TeamToken
+		Team  string
+	}{
+		SitePage:   html.NewSitePage(r, "team tokens"),
+		Pagination: &resource.Pagination{},
+		Items:      tokens,
+		Team:       team,
+	})
 }
 
 //

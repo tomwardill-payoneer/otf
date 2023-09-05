@@ -76,6 +76,41 @@ func (db *pgdb) deleteUserToken(ctx context.Context, id string) error {
 }
 
 //
+// Team tokens
+//
+
+func (db *pgdb) createTeamToken(ctx context.Context, token *TeamToken) error {
+	_, err := db.Conn(ctx).InsertTeamToken(ctx, pggen.InsertTeamTokenParams{
+		TeamTokenID: sql.String(token.ID),
+		Description: sql.String(token.Description),
+		TeamID:      sql.String(token.Team),
+		CreatedAt:   sql.Timestamptz(token.CreatedAt),
+		Expiry:      sql.TimestamptzPtr(token.Expiry),
+	})
+	return err
+}
+
+func (db *pgdb) getTeamTokensByTeam(ctx context.Context, team string) ([]*TeamToken, error) {
+	result, err := db.Conn(ctx).FindTeamTokensByTeam(ctx, sql.String(team))
+	if err != nil {
+		return nil, err
+	}
+
+	var tokens []*TeamToken
+	for _, row := range result {
+		tokens = append(tokens, &TeamToken{
+			ID:          row.TeamTokenID.String,
+			CreatedAt:   row.CreatedAt.Time.UTC(),
+			Description: row.Description.String,
+			Team:        row.TeamID.String,
+			Expiry:      internal.Time(row.Expiry.Time.UTC()),
+		})
+	}
+
+	return tokens, nil
+}
+
+//
 // Organization tokens
 //
 

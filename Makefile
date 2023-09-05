@@ -3,7 +3,7 @@ GIT_COMMIT = $(shell git rev-parse HEAD)
 RANDOM_SUFFIX := $(shell cat /dev/urandom | tr -dc 'a-z0-9' | head -c5)
 IMAGE_NAME = leg100/otfd
 IMAGE_TAG ?= $(VERSION)-$(RANDOM_SUFFIX)
-GOOSE_DBSTRING=postgres:///otf
+GOOSE_DBSTRING=postgres://postgres:postgres@localhost/otf
 LD_FLAGS = " \
     -s -w \
 	-X 'github.com/leg100/otf/internal.Version=$(VERSION)' \
@@ -116,7 +116,7 @@ install-pggen:
 .PHONY: sql
 sql: install-pggen
 	pggen gen go \
-		--postgres-connection "dbname=otf" \
+		--postgres-connection "host=127.0.0.1 user=postgres password=postgres dbname=otf" \
 		--query-glob 'internal/sql/queries/*.sql' \
 		--output-dir ./internal/sql/pggen \
 		--go-type 'text=github.com/jackc/pgtype.Text' \

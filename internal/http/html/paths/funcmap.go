@@ -107,6 +107,14 @@ func init() {
 	funcmap["addMemberTeamPath"] = AddMemberTeam
 	funcmap["removeMemberTeamPath"] = RemoveMemberTeam
 
+	funcmap["teamTokensPath"] = TeamTokens
+	funcmap["createTeamTokenPath"] = CreateTeamToken
+	funcmap["newTeamTokenPath"] = NewTeamToken
+	funcmap["teamTokenPath"] = TeamToken
+	funcmap["editTeamTokenPath"] = EditTeamToken
+	funcmap["updateTeamTokenPath"] = UpdateTeamToken
+	funcmap["deleteTeamTokenPath"] = DeleteTeamToken
+
 	funcmap["vcsProvidersPath"] = VCSProviders
 	funcmap["createVCSProviderPath"] = CreateVCSProvider
 	funcmap["newVCSProviderPath"] = NewVCSProvider

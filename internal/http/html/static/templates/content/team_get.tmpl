@@ -5,6 +5,8 @@
   /
 {{ .Team.Name }}{{ end }}
 
+{{ define "content-header-links" }}{{ template "team-header" . }}{{ end }}
+
 {{ define "content" }}
   {{ if .CanUpdateTeam }}
     <h3 class="font-semibold my-2 text-lg">Permissions</h3>
