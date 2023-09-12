@@ -1,0 +1,18 @@
+{{ template "layout" . }}
+
+{{ define "content-header-title" }}
+  <div><a href="{{ teamPath .Team }}">team</a> / <a href="{{ teamTokensPath .Team }}">tokens</a> / new</div>
+{{ end }}
+
+{{ define "content" }}
+  <form class="flex flex-col gap-2" action="{{ createTeamTokenPath .Team }}" method="POST">
+    <input type="hidden" name="team_id" description="team_id" value={{ .Team }} />
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea class="text-input w-80" name="description" id="description" required></textarea>
+    </div>
+    <div>
+      <button class="btn">Create token</button>
+    </div>
+  </form>
+{{ end }}

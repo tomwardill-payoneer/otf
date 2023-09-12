@@ -5,7 +5,7 @@
 {{ end }}
 
 {{ define "content-header-actions" }}
-  <form action="{{ newTokenPath }}" method="GET">
+  <form action="{{ newTeamTokenPath .Team }}" method="GET">
     <button class="btn" id="new-user-token-button">New Token</button>
   </form>
 {{ end }}

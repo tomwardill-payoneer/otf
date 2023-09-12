@@ -43,6 +43,8 @@ func (h *webHandlers) addHandlers(r *mux.Router) {
 
 	// team tokens
 	r.HandleFunc("/teams/{team_id}/team-tokens", h.teamTokens).Methods("GET")
+	r.HandleFunc("/teams/{team_id}/team-tokens/new", h.newTeamToken).Methods("GET")
+	r.HandleFunc("/teams/{team_id}/team-tokens/create", h.createTeamToken).Methods("POST")
 
 	// organization tokens
 	r.HandleFunc("/organizations/{organization_name}/tokens/show", h.organizationToken).Methods("GET")
@@ -127,7 +129,10 @@ func (h *webHandlers) deleteUserToken(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, paths.Tokens(), http.StatusFound)
 }
 
+//
 // Team tokens
+//
+
 func (h *webHandlers) teamTokens(w http.ResponseWriter, r *http.Request) {
 	team, err := decode.Param("team_id", r)
 	if err != nil {
@@ -158,6 +163,47 @@ func (h *webHandlers) teamTokens(w http.ResponseWriter, r *http.Request) {
 		Items:      tokens,
 		Team:       team,
 	})
+}
+
+func (h *webHandlers) newTeamToken(w http.ResponseWriter, r *http.Request) {
+	team, err := decode.Param("team_id", r)
+	if err != nil {
+		h.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	h.Render("team_token_new.tmpl", w, struct {
+		html.SitePage
+		Team string
+	}{
+		SitePage: html.NewSitePage(r, "new team token"),
+		Team:     team,
+	})
+}
+
+func (h *webHandlers) createTeamToken(w http.ResponseWriter, r *http.Request) {
+	team, err := decode.Param("team_id", r)
+	if err != nil {
+		h.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	var opts CreateTeamTokenOptions
+	if err := decode.Form(&opts, r); err != nil {
+		h.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	_, token, err := h.svc.CreateTeamToken(r.Context(), opts)
+
+	if err != nil {
+		h.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.tokenFlashMessage(w, token); err != nil {
+		h.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, paths.TeamTokens(team), http.StatusFound)
 }
 
 //

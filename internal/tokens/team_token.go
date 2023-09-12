@@ -25,7 +25,7 @@ type (
 	// CreateTeamTokenOptions are options for creating an team token via the service
 	// endpoint
 	CreateTeamTokenOptions struct {
-		Team   string `schema:"team_name,required"`
+		Team   string `schema:"team_id,required"`
 		Expiry *time.Time
 	}
 
