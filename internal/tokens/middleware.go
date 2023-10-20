@@ -28,6 +28,7 @@ type (
 	middlewareOptions struct {
 		agentTokenService
 		organizationTokenService
+		teamTokenService
 		auth.AuthService
 
 		GoogleIAPConfig
@@ -148,6 +149,9 @@ func (m *middleware) validateBearer(ctx context.Context, bearer string) (interna
 		return m.GetUser(ctx, auth.UserSpec{AuthenticationTokenID: internal.String(parsed.Subject())})
 	case organizationTokenKind:
 		return m.getOrganizationTokenByID(ctx, parsed.Subject())
+	case teamTokenKind:
+		subject := parsed.Subject()
+		return m.getTeamTokenByID(ctx, subject)
 	case runTokenKind:
 		return NewRunTokenFromJWT(parsed)
 	default:

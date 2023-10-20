@@ -118,6 +118,22 @@ func (db *pgdb) deleteTeamToken(ctx context.Context, team string) error {
 	return nil
 }
 
+func (db *pgdb) getTeamTokenByID(ctx context.Context, tokenID string) (*TeamToken, error) {
+	result, err := db.Conn(ctx).FindTeamTokenByID(ctx, sql.String(tokenID))
+	if err != nil {
+		return nil, sql.Error(err)
+	}
+	ot := &TeamToken{
+		ID:        result.TeamTokenID.String,
+		CreatedAt: result.CreatedAt.Time.UTC(),
+		Team:      result.TeamID.String,
+	}
+	if result.Expiry.Status == pgtype.Present {
+		ot.Expiry = internal.Time(result.Expiry.Time.UTC())
+	}
+	return ot, nil
+}
+
 //
 // Organization tokens
 //

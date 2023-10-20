@@ -45,8 +45,41 @@ type (
 		GetTeamToken(ctx context.Context, team string) (*TeamToken, error)
 		// DeleteTeamToken deletes an team token.
 		DeleteTeamToken(ctx context.Context, tokenID string) error
+
+		getTeamTokenByID(ctx context.Context, tokenID string) (*TeamToken, error)
 	}
 )
+
+func (u *TeamToken) CanAccessOrganization(action rbac.Action, org string) bool {
+	return false
+}
+
+func (u *TeamToken) CanAccessSite(action rbac.Action) bool {
+	// only be used for team-scoped resources.
+	return false
+}
+
+func (u *TeamToken) CanAccessTeam(action rbac.Action, teamName string) bool {
+	return u.Team == teamName
+}
+
+func (u *TeamToken) CanAccessWorkspace(action rbac.Action, policy internal.WorkspacePolicy) bool {
+	return false
+}
+
+func (u *TeamToken) IsOwner(team string) bool {
+	// an owner would give perms to all actions in org whereas an org token
+	// cannot perform certain actions, so org token is not an owner.
+	return false
+}
+
+func (u *TeamToken) IsSiteAdmin() bool { return false }
+func (u *TeamToken) String() string    { return u.ID }
+
+func (u *TeamToken) Organizations() []string {
+
+	return []string{""}
+}
 
 func NewTeamToken(opts NewTeamTokenOptions) (*TeamToken, []byte, error) {
 	ot := TeamToken{
@@ -112,4 +145,8 @@ func (a *service) DeleteTeamToken(ctx context.Context, team string) error {
 	a.V(0).Info("deleted team token", "team", team)
 
 	return nil
+}
+
+func (a *service) getTeamTokenByID(ctx context.Context, tokenID string) (*TeamToken, error) {
+	return a.db.getTeamTokenByID(ctx, tokenID)
 }
