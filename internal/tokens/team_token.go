@@ -82,22 +82,22 @@ func (u *TeamToken) Organizations() []string {
 }
 
 func NewTeamToken(opts NewTeamTokenOptions) (*TeamToken, []byte, error) {
-	ot := TeamToken{
-		ID:        internal.NewID("ot"),
+	tt := TeamToken{
+		ID:        internal.NewID("tt"),
 		CreatedAt: internal.CurrentTimestamp(),
 		Team:      opts.Team,
 		Expiry:    opts.Expiry,
 	}
 	token, err := NewToken(NewTokenOptions{
 		key:     opts.key,
-		Subject: ot.ID,
+		Subject: tt.ID,
 		Kind:    teamTokenKind,
 		Expiry:  opts.Expiry,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
-	return &ot, token, nil
+	return &tt, token, nil
 }
 
 func (a *service) CreateTeamToken(ctx context.Context, opts CreateTeamTokenOptions) (*TeamToken, []byte, error) {
@@ -107,7 +107,7 @@ func (a *service) CreateTeamToken(ctx context.Context, opts CreateTeamTokenOptio
 		return nil, nil, err
 	}
 
-	ot, token, err := NewTeamToken(NewTeamTokenOptions{
+	tt, token, err := NewTeamToken(NewTeamTokenOptions{
 		CreateTeamTokenOptions: opts,
 		Team:                   opts.Team,
 		key:                    a.key,
@@ -117,14 +117,14 @@ func (a *service) CreateTeamToken(ctx context.Context, opts CreateTeamTokenOptio
 		return nil, nil, err
 	}
 
-	if err := a.db.createTeamToken(ctx, ot); err != nil {
+	if err := a.db.createTeamToken(ctx, tt); err != nil {
 		a.Error(err, "creating team token", "team", opts.Team)
 		return nil, nil, err
 	}
 
 	a.V(0).Info("created team token", "team", opts.Team)
 
-	return ot, token, nil
+	return tt, token, nil
 }
 
 func (a *service) GetTeamToken(ctx context.Context, team string) (*TeamToken, error) {
